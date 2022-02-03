@@ -23,6 +23,17 @@ public class Animal {
     ;
   }
 
+  public Animal(String nomA, String sexe, String type, String fonction_cage, String pays, int anNais, Cage laCage, Set<String> lstMaladies) {
+    this.nomA = nomA;
+    this.sexe = sexe;
+    this.type = type;
+    this.fonction_cage = fonction_cage;
+    this.pays = pays;
+    this.anNais = anNais;
+    this.laCage = laCage;
+    this.lstMaladies = lstMaladies;
+  }
+
   public long getAn_id() {
     return an_id;
   }

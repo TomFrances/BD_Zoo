@@ -78,7 +78,6 @@ public class ZooApp {
 	 * @throws SQLException
 	 */
 	private static void affichageAnimaux() throws SQLException {
-
 		Connection conn = TheConnection.getInstance();
 		AnimalDAO aDao = new AnimalDAO(conn);
 		Set<Animal> listeAnimaux = new HashSet<>();
@@ -114,22 +113,21 @@ public class ZooApp {
 		System.out.print("Année de naissance : ");
 		int anNaiss = sc.nextInt();
 
-		System.out.print("Numéro de la cage de l'animal : ");
+		System.out.println("Numéro de la cage de l'animal : ");
 		Set<Cage> listeCagesFonction = cageDao.readByFonction(fonction);
 		ArrayList<Integer> listeNumCages = new ArrayList<>();
 		listeCagesFonction.forEach(cage -> listeNumCages.add(cage.getNoCage()));
 
 		int noCageTemp = -1;
 		do {
-			System.out.print("Cage(s) disponible(s) : ");
+			System.out.print("numéro des cages disponibles : ");
 			listeNumCages.forEach(no -> System.out.print(no + "; "));
 			noCageTemp = sc.nextInt();
 		} while (!listeNumCages.contains(noCageTemp));
 
 		final int noCage = noCageTemp;
-		Cage cage = listeCagesFonction
-				.stream()
-				.reduce(null, (cageCorr, cageCourante) -> cageCourante.getNoCage() == noCage ? cageCourante : cageCorr);
+		Cage cage = listeCagesFonction.stream()
+				.reduce(null, (cageChoisie, cageCourante) -> cageCourante.getNoCage() == noCage ? cageCourante : cageChoisie);
 
 		Set<String> maladies = new HashSet<>();
 		String maladie = "";
@@ -141,19 +139,9 @@ public class ZooApp {
 			if (!maladie.equals("0")) {
 				maladies.add(maladie);
 			}
-
 		} while (!maladie.equals("0"));
 
-		Animal animal = new Animal();
-		animal.setAnNais(anNaiss);
-		animal.setFonctionCage(fonction);
-		animal.setLaCage(cage);
-		animal.setMaladies(maladies);
-		animal.setNomA(nom);
-		animal.setPays(pays);
-		animal.setSexe(sexe);
-		animal.setType(type);
-
+		Animal animal = new Animal(nom, sexe, type, fonction, pays, anNaiss, cage, maladies);
 		AnimalDAO animalDao = new AnimalDAO(conn);
 		animalDao.create(animal);
 

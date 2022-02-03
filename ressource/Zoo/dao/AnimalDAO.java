@@ -20,11 +20,9 @@ public class AnimalDAO extends DAO<Animal> {
 
 	@Override
 	public boolean create(Animal obj) throws SQLException {
-
-		/* TO DO */
 		try {
-			String sql = "insert into LesAnimaux values (?,?,?,?,?,?,?,?)";
-			PreparedStatement query = this.conn.prepareStatement(sql);
+			String sqlAnimaux = "insert into LesAnimaux values (?,?,?,?,?,?,?,?)";
+			PreparedStatement query = this.conn.prepareStatement(sqlAnimaux);
 			query.setString(1, obj.getNomA());
 			query.setString(2, obj.getSexe());
 			query.setString(3, obj.getType());
@@ -37,16 +35,14 @@ public class AnimalDAO extends DAO<Animal> {
 			//exécution
 			query.executeQuery();
 
-			sql = "insert into LesMaladies values (?,?)";
-			query = this.conn.prepareStatement(sql);
+			String sqlMaladies = "insert into LesMaladies values (?,?)";
+			query = this.conn.prepareStatement(sqlMaladies);
 			query.setString(1, obj.getNomA());
 
-			System.out.println(String.format("Nombre de maladies de l'animal %s : %d", obj.getNomA(), obj.getMaladies().size()));
 			for(String maladie : obj.getMaladies()){
 				query.setString(2, maladie);
 				query.executeQuery();
 			}
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
