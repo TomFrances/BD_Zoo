@@ -1,0 +1,554 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ right=20mm,
+ top=30mm,
+ bottom=30mm
+ }\usepackage{xcolor,listings}
+\usepackage{textcomp}
+\usepackage{color}
+\usepackage{graphicx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{HTML}{C42043}
+\definecolor{backcolour}{HTML}{F2F2F2}
+\definecolor{bookColor}{cmyk}{0,0,0,0.90}  
+\color{bookColor}
+
+\lstset{upquote=true}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\numberstyle,
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize\ttfamily,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=10pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+}
+\lstset{style=mystyle}
+
+\newcommand\numberstyle[1]{%
+    \footnotesize
+    \color{codegray}%
+    \ttfamily
+    \ifnum#1<10 0\fi#1 |%
+}
+
+%opening
+\title{BD : Gestion d'un zoo, TP1}
+\author{Frances Tom, Gourdon Jérémie}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\section{Complétion du schéma}
+
+Le code de création des tables complété est donné en annexe.\\
+Nous avons de plus rajouté 2 tuples dans les tables LesCages et LesAnimaux pour avoir 2 cages contenant des léopards :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+insert into LesCages values (13 , 'fauve' , 2); 
+insert into LesAnimaux values ('Magalie', 'femelle' , 'leopard', 'fauve', 'Italie', 2014, 13);
+\end{lstlisting}
+
+\section{Requêtes SQL}
+
+\subsection{Dans quelles cages se trouvent les lions et les léopards ?}
+
+Algèbre :
+(LesAnimaux : type\_an = 'lion' OR type\_an = 'leopard) [noCage]\\
+
+\noindent
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT DISTINCT noCage AS numeroCage_Q1
+FROM LesAnimaux
+WHERE type_an='lion' OR type_an='leopard';
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q1.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels sont les gardiens qui gardent des cages de léopards ?}
+
+Algèbre :
+((LesGardiens * LesAnimaux) : type\_an = 'leopard' ) [nomE]\\
+
+\noindent
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT DISTINCT nomE
+FROM LesGardiens NATURAL JOIN LesAnimaux
+WHERE type_an='leopard';
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q2.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels sont les gardiens qui gardent à la fois des cages de léopards et de lions ?}
+
+Algèbre :
+((LesGardiens * LesAnimaux) : type\_an = 'leopard') [nomE]
+INTERSECT
+((LesGardiens * LesAnimaux) : type\_san = 'lion') [nomE]\\
+
+\noindent
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+-- V1 --
+SELECT DISTINCT nomE
+FROM LesGardiens G JOIN LesAnimaux A1 USING (noCage) 
+WHERE type_an='leopard' 
+AND nomE IN (   SELECT nomE 
+                FROM LesGardiens G JOIN LesAnimaux A1 USING (noCage) 
+                WHERE type_an='lion' );
+
+-- V2 --
+SELECT nomE
+FROM LesGardiens JOIN LesAnimaux USING (noCage)
+WHERE type_an='leopard'
+INTERSECT
+SELECT nomE
+FROM LesGardiens JOIN LesAnimaux USING (noCage)
+WHERE type_an='lion';
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q3.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels sont les gardiens qui gardent des animaux qui sont ou ont été malades ?}
+
+Algèbre :
+((LesMaladies * LesAnimaux) * LesGardiens ) [nomE]\\
+
+\noindent
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT DISTINCT nomE
+FROM LesMaladies JOIN LesAnimaux USING (nomA)
+                 JOIN LesGardiens USING (noCage);
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q4.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels sont les responsables qui ont ou ont eu des animaux malades dans leur allée ?}
+
+Algèbre :
+(((LesResponsables * LesCages) * LesAnimaux ) * LesMaladies ) [nomE]\\
+
+\noindent
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT DISTINCT nomE
+FROM LesResponsables JOIN LesCages USING (noAllee)
+                     JOIN LesAnimaux USING (noCage)
+                     JOIN LesMaladies USING (nomA);
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q5.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels sont les gardiens qui ne gardent pas de cage de léopards ?}
+
+Algèbre :
+(LesGardiens) [nomE] - ((LesGardiens * LesAnimaux) : type\_an = 'leopard) [nomE]\\
+
+\noindent
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT DISTINCT nomE
+FROM LesGardiens
+WHERE nomE NOT IN ( SELECT nomE
+                    FROM LesGardiens NATURAL JOIN LesAnimaux
+                    WHERE type_an='leopard' );
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q6.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Combien d’animaux sont malades ?}
+
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT COUNT(DISTINCT nomA) AS NbAnimauxMalade
+FROM LesMaladies;
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q7.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Combien y a-t-il d’animaux malades par type de maladie ?}
+
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT nomM, COUNT(nomA) AS NbAnimauxMaladeParMaladie
+FROM LesMaladies
+GROUP BY nomM;
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q8.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels sont les animaux avec au moins deux maladies ?}
+
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT nomA
+FROM LesMaladies
+GROUP BY nomA
+HAVING COUNT(nomM) >= 2;
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q9.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels gardiens gardent plus de deux cages avec la fonction "fauve" ?}
+
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT nomE
+FROM LesGardiens NATURAL JOIN LesCages
+WHERE fonction='fauve'
+GROUP BY nomE
+HAVING COUNT(noCage) >= 2;
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q10.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels responsables possèdent le plus de cages dans une de ses allées ?}
+Pour cette requête, nous avons supposé que toutes les allées devaient avoir un responsbable.
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT nomE
+FROM LesResponsables NATURAL JOIN LesCages
+GROUP BY nomE, noAllee
+HAVING COUNT(noCage) = (SELECT MAX(COUNT(noCage))
+                        FROM LesCages
+                        GROUP BY noAllee);
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q11.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Quels sont les gardiens qui gardent toutes les cages de léopards ?}
+Pour cette requête, nous avons supposé que toutes les allées devaient avoir un responsbable.
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT nomE
+FROM LesGardiens NATURAL JOIN LesAnimaux
+WHERE type_an='leopard'
+GROUP BY nomE
+HAVING COUNT(DISTINCT noCage) = (   SELECT COUNT(DISTINCT noCage)
+                                    FROM LesAnimaux
+                                    WHERE type_an='leopard');
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q12.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Pour chaque gardien, donner le nombre de léopards gardés ? (on veut tous les gardiens)}
+
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT nomE, NVL(COUNT(nomA), 0) AS NbLeopardsGardes
+FROM LesGardiens G LEFT JOIN LESANIMAUX A ON (A.noCage=G.noCage AND type_an='leopard')
+GROUP BY nomE;
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q13.png} \\
+\end{tabular}
+\end{center}
+
+\subsection{Pour chaque gardien, donner le nombre de cage de léopards gardées ? (on veut tous les gardiens)}
+
+Code :
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+SELECT nomE, nvl(COUNT(DISTINCT A.noCage), 0) AS NbCagesLeopardsGardees
+FROM LesGardiens G LEFT JOIN LesAnimaux A ON (A.noCage=G.noCage AND A.type_an='leopard')
+GROUP BY nomE;
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{c}
+Résultat :\\
+
+\includegraphics[scale=0.6]{images/Q14.png} \\
+\end{tabular}
+\end{center}
+
+\newpage
+
+\section{Annexe}
+\begin{lstlisting}[ language=SQL,
+                    deletekeywords={IDENTITY},
+                    deletekeywords={[2]INT},
+                    morekeywords={clustered},
+                    framesep=8pt,
+                    xleftmargin=40pt,
+                    framexleftmargin=40pt,
+                    frame=tb,
+                    framerule=0pt ]
+drop table LesMaladies ;
+drop table LesAnimaux ;
+drop table LesResponsables ;
+drop table LesGardiens ;
+drop table LesEMployes ;
+drop table LesCages ;
+
+create table LesCages (
+	noCage number(3),
+	fonction varchar2(20),
+	noAllee number(3),
+	constraint pk_LesCages_noCage PRIMARY KEY (noCage),
+	constraint ck_LesCages_noCage CHECK(noCage > 0 AND noCage < 1000),
+	constraint ck_LesCages_noAllee CHECK(noAllee > 0 AND noAllee < 1000)
+);
+
+create table LesEmployes (
+	nomE varchar2(20),
+	adresse varchar2(20),
+	constraint pk_LesEmployes_nomE PRIMARY KEY (nomE)
+);
+
+create table LesGardiens (
+	noCage number(3),
+	nomE varchar2(20),
+	constraint pk_LesGardiens_noCage_nomE PRIMARY KEY (noCage, nomE),
+	constraint fk_LesGardiens_nomE FOREIGN KEY (nomE) REFERENCES LesEmployes (nomE),
+	constraint fk_LesGardiens_noCage FOREIGN KEY (noCage) REFERENCES LesCages (noCage),
+	constraint ck_LesGardiens_noCage CHECK(noCage > 0 AND noCage < 1000)
+);
+
+create table LesResponsables (
+	noAllee number(3),
+	nomE varchar2(20),
+	constraint pk_LesResp_noAllee_nomE PRIMARY KEY (noAllee, nomE),
+	constraint fk_LesResp_nomE FOREIGN KEY (nomE) REFERENCES LesEmployes (nomE),
+	constraint ck_LesResponsables_noAllee CHECK(noAllee > 0 AND noAllee < 1000)
+);
+		
+create table LesAnimaux (
+	nomA varchar2(20),
+	sexe varchar2(13),
+	type_an varchar2(15),
+	fonction_cage varchar2(20),
+	pays varchar2(20),
+	anNais number(4),
+	noCage number(3),
+	constraint pk_LesAnimaux_nomA PRIMARY KEY (nomA),
+	constraint fk_LesAnimaux_noCage FOREIGN KEY (noCage) REFERENCES LesCages (noCage),
+	constraint ck_LesAnimaux_sexe CHECK (sexe IN ('femelle', 'male', 'hermaphrodite')),
+	constraint ck_LesAnimaux_noCage CHECK (noCage > 0 AND noCage < 1000),
+	constraint ck_LesAnimaux_annais CHECK (annais >= 2000)
+);
+
+create table LesMaladies (
+	nomA varchar2(20),
+	nomM varchar2(20),
+	constraint pk_LesMaladies_nomA_nomM PRIMARY KEY (nomA, nomM),
+	constraint fk_LesMaladies_nomA FOREIGN KEY (nomA) REFERENCES LesAnimaux (nomA)
+);
+\end{lstlisting}
+
+\end{document}
