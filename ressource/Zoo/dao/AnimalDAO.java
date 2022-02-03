@@ -34,6 +34,7 @@ public class AnimalDAO extends DAO<Animal> {
 			query.setInt(7, obj.getLaCage().getNoCage());
 			query.setInt(8, obj.getMaladies().size());
 
+			//exécution
 			query.executeQuery();
 
 			sql = "insert into LesMaladies values (?,?)";

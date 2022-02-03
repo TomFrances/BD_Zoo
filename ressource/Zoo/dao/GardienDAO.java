@@ -29,45 +29,6 @@ public class GardienDAO extends DAO<Gardien> {
 		Gardien gardien = null;
 
 		/* TO DO */
-		try {
-			ResultSet result = this.conn.createStatement().executeQuery("select * from LesGardiens where ");
-			while (resultAnimaux.next()) {
-
-				Animal animal = new Animal();
-
-				animal.setNomA(resultAnimaux.getString("nomA"));
-				animal.setSexe(resultAnimaux.getString("sexe"));
-				animal.setType(resultAnimaux.getString("type_an"));
-				animal.setFonctionCage(resultAnimaux.getString("fonction_cage"));
-				animal.setPays(resultAnimaux.getString("pays"));
-				animal.setAnNais(resultAnimaux.getInt("anNais"));
-
-				int noCage = resultAnimaux.getInt("noCage");
-
-				ResultSet resultCage = this.conn.createStatement().executeQuery(String.format("select * from LesCages where noCage = %d", noCage));
-				Cage cage = new Cage(noCage);
-				resultCage.next();
-				cage.setFonction(resultCage.getString("fonction"));
-				cage.setNoAlle(resultCage.getLong("noAllee"));
-
-				animal.setLaCage(cage);
-
-				ResultSet resultMaladies = this.conn.createStatement()
-						.executeQuery(String.format("select * from LesMaladies where nomA = '%s'", animal.getNomA()));
-
-				Set<String> maladies = new HashSet<>();
-				while(resultMaladies.next()) {
-					maladies.add(resultMaladies.getString("nomM"));
-				} 
-
-				animal.setMaladies(maladies);
-
-				animaux.add(animal);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 
 		return gardien;
 	}

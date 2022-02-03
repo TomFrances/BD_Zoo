@@ -13,39 +13,24 @@
 \usepackage{color}
 \usepackage{graphicx}
 
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{HTML}{C42043}
-\definecolor{backcolour}{HTML}{F2F2F2}
-\definecolor{bookColor}{cmyk}{0,0,0,0.90}  
-\color{bookColor}
+\definecolor{pblue}{rgb}{0.13,0.13,1}
+\definecolor{pgreen}{rgb}{0,0.5,0}
+\definecolor{pred}{rgb}{0.9,0,0}
+\definecolor{pgrey}{rgb}{0.46,0.45,0.48}
 
-\lstset{upquote=true}
-
-\lstdefinestyle{mystyle}{
-    backgroundcolor=\color{backcolour},   
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{codepurple},
-    numberstyle=\numberstyle,
-    stringstyle=\color{codepurple},
-    basicstyle=\footnotesize\ttfamily,
-    breakatwhitespace=false,
-    breaklines=true,
-    captionpos=b,
-    keepspaces=true,
-    numbers=left,
-    numbersep=10pt,
-    showspaces=false,
-    showstringspaces=false,
-    showtabs=false,
-}
-\lstset{style=mystyle}
-
-\newcommand\numberstyle[1]{%
-    \footnotesize
-    \color{codegray}%
-    \ttfamily
-    \ifnum#1<10 0\fi#1 |%
+\usepackage{listings}
+\lstset{language=Java,
+  showspaces=false,
+  showtabs=false,
+  breaklines=true,
+  showstringspaces=false,
+  breakatwhitespace=true,
+  commentstyle=\color{pgreen},
+  keywordstyle=\color{pblue},
+  stringstyle=\color{pred},
+  basicstyle=\ttfamily,
+  moredelim=[il][\textcolor{pgrey}]{$$},
+  moredelim=[is][\textcolor{pgrey}]{\%\%}{\%\%}
 }
 
 %opening
@@ -61,7 +46,7 @@
 
 Le code de création des tables complété est donné en annexe.\\
 Nous avons de plus rajouté 2 tuples dans les tables LesCages et LesAnimaux pour avoir 2 cages contenant des léopards :
-\begin{lstlisting}[ language=SQL,
+\begin{lstlisting}[ language=JAVA,
                     deletekeywords={IDENTITY},
                     deletekeywords={[2]INT},
                     morekeywords={clustered},
@@ -70,9 +55,15 @@ Nous avons de plus rajouté 2 tuples dans les tables LesCages et LesAnimaux pour
                     framexleftmargin=40pt,
                     frame=tb,
                     framerule=0pt ]
-insert into LesCages values (13 , 'fauve' , 2); 
-insert into LesAnimaux values ('Magalie', 'femelle' , 'leopard', 'fauve', 'Italie', 2014, 13);
-\end{lstlisting}
+private static void affichageAnimaux() throws SQLException {
+
+		Connection conn = TheConnection.getInstance();
+		AnimalDAO aDao = new AnimalDAO(conn);
+		Set<Animal> listeAnimaux = new HashSet<>();
+		listeAnimaux = aDao.readAll();
+		listeAnimaux.forEach(x -> System.out.println(x));
+		conn.rollback();
+	}\end{lstlisting}
 
 \section{Requêtes SQL}
 

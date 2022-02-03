@@ -82,8 +82,7 @@ public class ZooApp {
 		Connection conn = TheConnection.getInstance();
 		AnimalDAO aDao = new AnimalDAO(conn);
 		Set<Animal> listeAnimaux = new HashSet<>();
-		listeAnimaux = aDao.readAll();
-		listeAnimaux.forEach(x -> System.out.println(x));
+		aDao.readAll().forEach(System.out::println);
 		conn.rollback();
 	}
 
