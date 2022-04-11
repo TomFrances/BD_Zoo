@@ -1,10 +1,6 @@
 package modele;
 
-import java.util.HashSet;
 import java.util.Set;
-
-import modele.Cage;
-import modele.Specialite;
 
 public class Gardien {
    private String nomE ;

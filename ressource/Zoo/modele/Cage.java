@@ -1,8 +1,5 @@
 package modele;
 
-import modele.Animal;
-import modele.Gardien;
-
 import java.util.Set;
 
 public class Cage {

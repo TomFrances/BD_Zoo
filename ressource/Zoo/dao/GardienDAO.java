@@ -1,16 +1,12 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import modele.Cage;
 import modele.Gardien;
-import modele.Specialite;
 
 public class GardienDAO extends DAO<Gardien> {
 
@@ -26,11 +22,7 @@ public class GardienDAO extends DAO<Gardien> {
 
 	@Override
 	public Gardien read(Object obj) throws SQLException{
-		Gardien gardien = null;
-
-		/* TO DO */
-
-		return gardien;
+		return null;
 	}
 
 	@Override

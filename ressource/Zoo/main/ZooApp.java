@@ -1,23 +1,16 @@
 package main;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
 import dao.CageDAO;
-import dao.GardienDAO;
 import dao.AnimalDAO;
 import modele.Cage;
-import modele.Gardien;
 import modele.Animal;
-import modele.Specialite;
-import oracle.sql.ARRAY;
-import utils.LectureClavier;
 import utils.TheConnection;
 
 public class ZooApp {
@@ -45,10 +38,6 @@ public class ZooApp {
 					case 2:
 						System.out.flush();
 						ajouterAnimal();
-						break;
-					case 3:
-						System.out.flush();
-						ajouterCageGardien();
 						break;
 					default:
 						System.out.flush();
@@ -146,22 +135,7 @@ public class ZooApp {
 		animalDao.create(animal);
 
 		conn.commit();
-	}
-
-	/**
-	 * Ajouter une cage à la liste de cages gardés par un gardien
-	 */
-	private static void ajouterCageGardien() throws SQLException {
-		Connection conn = TheConnection.getInstance();
-
-		Scanner sc = new Scanner(System.in);
-		System.out.print("Nom du gardien : ");
-
-		String nomG = sc.nextLine();
-
-		
-
-		conn.commit();
+		sc.close();
 	}
 
 }

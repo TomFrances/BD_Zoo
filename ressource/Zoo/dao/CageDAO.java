@@ -1,7 +1,6 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -30,7 +29,6 @@ public class CageDAO extends DAO<Cage> {
 	
 	public Set<Cage> readByFonction(String fonction) throws SQLException {
 		Set<Cage> cages = new HashSet<>();
-        /* TO DO */
 		try {
 			ResultSet resultCages = this.conn.createStatement()
 			.executeQuery(String.format("select * from LesCages where fonction = '%s'", fonction));
@@ -48,11 +46,7 @@ public class CageDAO extends DAO<Cage> {
 	}
 
 	public Set<Cage> readByGardien(Gardien g) throws SQLException {
-		Set<Cage> cages = new HashSet<>();
-
-                /* TO DO */
-
-		return cages;
+		return null;
 	}
 	
 	@Override
